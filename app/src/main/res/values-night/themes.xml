@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Mizan" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">#121610</item>
+        <item name="android:navigationBarColor">#1B2118</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">@color/bg_night</item>
+    </style>
+    <color name="bg_night">#121610</color>
+</resources>

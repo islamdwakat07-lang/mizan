@@ -1,0 +1,774 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>ميزان</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap">
+<style>
+/* Layout: one-column phone app, olive-and-sumac palette from the Palestinian kitchen; fixed bottom tab bar */
+:root{
+  --bg:#F2F4EE; --surface:#FFFFFF; --line:#DDE3D5; --fg:#1D2519; --muted:#5F6B57;
+  --olive:#56732A; --olive-soft:#E6EDDA; --sumac:#A3343F; --sumac-soft:#F6E3E4;
+  --water:#2C7899; --water-soft:#DDEEF5; --amber:#B07A12;
+  --f-display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --f-body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121610; --surface:#1B2118; --line:#2D3628; --fg:#E7ECE1; --muted:#9AA690;
+  --olive:#9DBE63; --olive-soft:#26321B; --sumac:#E0717B; --sumac-soft:#3A2023;
+  --water:#6CB8D8; --water-soft:#18303A; --amber:#E0AE4A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121610; --surface:#1B2118; --line:#2D3628; --fg:#E7ECE1; --muted:#9AA690;
+  --olive:#9DBE63; --olive-soft:#26321B; --sumac:#E0717B; --sumac-soft:#3A2023;
+  --water:#6CB8D8; --water-soft:#18303A; --amber:#E0AE4A; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.6;direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:12px calc(84px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
+h1{font-size:24px} h2{font-size:17px} h3{font-size:15px}
+.num{font-family:var(--f-display);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)} .small{font-size:13px}
+header.top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--f-display);font-size:20px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:9px 14px}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--olive);outline-offset:2px}
+.btn-main{background:var(--olive);border-color:var(--olive);color:var(--surface);font-weight:600}
+.btn-danger{color:var(--sumac);border-color:var(--sumac)}
+.btn-sm{padding:5px 10px;font-size:13px}
+input,select,textarea{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%;min-width:0}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.ring-wrap{display:grid;grid-template-columns:132px 1fr;gap:16px;align-items:center}
+.ring-wrap svg{width:132px;height:132px}
+.ring-center{font-family:var(--f-display)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--olive);border-radius:99px}
+.pill{display:inline-block;font-size:12px;padding:2px 10px;border-radius:99px;background:var(--olive-soft);color:var(--olive);font-weight:600}
+.pill.warn{background:var(--sumac-soft);color:var(--sumac)}
+.cups{display:flex;gap:6px;flex-wrap:wrap}
+.cup{width:30px;height:38px;border:2px solid var(--water);border-radius:4px 4px 9px 9px;padding:0;background:transparent}
+.cup.on{background:var(--water)}
+.list{display:flex;flex-direction:column}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item .nm{min-width:0}
+.meal-h{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.02em;padding-top:8px}
+.x{border:0;background:transparent;color:var(--muted);padding:4px 8px;font-size:18px;line-height:1}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted)}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);
+  padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
+nav.tabs button{border:0;border-radius:0;background:transparent;padding:10px 2px 8px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
+nav.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+nav.tabs button[aria-selected="true"]{color:var(--olive);font-weight:600}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.chip{white-space:nowrap;border-radius:99px;padding:5px 12px;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--olive);color:var(--surface);border-color:var(--olive)}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:560px;max-height:88%;border-radius:18px 18px 0 0;display:flex;flex-direction:column;
+  padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));gap:10px}
+.sheet .list{overflow-y:auto;min-height:120px}
+.qty{display:flex;gap:6px;flex-wrap:wrap;padding-top:6px}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-size:10px;font-family:var(--f-body)}
+.advice{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:var(--bg)}
+.advice i{flex:none;width:8px;height:8px;border-radius:99px;margin-top:8px;background:var(--olive)}
+.advice.w i{background:var(--amber)} .advice.r i{background:var(--sumac)}
+.toast{position:fixed;bottom:calc(86px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:99px;font-size:14px;z-index:20}
+nav.tabs button{position:relative}
+.badge{position:absolute;top:4px;left:calc(50% - 22px);background:var(--sumac);color:var(--surface);font-size:11px;min-width:18px;height:18px;border-radius:99px;display:grid;place-items:center;padding:0 4px}
+.card.alarm{border-color:var(--sumac);background:var(--sumac-soft)}
+.card.alarm .advice{background:var(--surface)}
+.card.ok{border-color:var(--olive);background:var(--olive-soft);gap:2px}
+.verdict{border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line)}
+.verdict.go{background:var(--olive-soft);border-color:var(--olive)}
+.verdict.reduce{background:var(--bg);border-color:var(--amber)}
+.verdict.stop{background:var(--sumac-soft);border-color:var(--sumac)}
+.verdict h3{font-size:17px}
+.thumb{max-height:160px;border-radius:10px;object-fit:cover;width:100%}
+.ex-list{display:flex;flex-direction:column;gap:8px;counter-reset:ex}
+.ex{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.ex:last-child{border-bottom:0}
+.ex .n{font-family:var(--f-display);font-weight:700;color:var(--olive);grid-row:span 2}
+.ex .how{font-size:13px;color:var(--muted);grid-column:2}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;font-size:12px;color:var(--muted)}
+.week span{display:flex;flex-direction:column;align-items:center;gap:4px}
+.week i{width:26px;height:26px;border-radius:99px;border:2px solid var(--line);display:block}
+.week i.on{background:var(--olive);border-color:var(--olive)}
+.player{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column;justify-content:space-between;gap:16px;
+  padding:calc(20px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px))}
+.player .phase{font-size:13px;font-weight:600;letter-spacing:.03em;color:var(--muted)}
+.player .big{font-family:var(--f-display);font-size:96px;line-height:1;text-align:center;font-variant-numeric:tabular-nums}
+.player.rest .big{color:var(--water)}
+.player h2{font-size:26px}
+.player .ctl{display:grid;grid-template-columns:1fr 2fr 1fr;gap:10px}
+.player .ctl button{padding:14px}
+ul.tips{margin:0;padding-inline-start:18px;display:flex;flex-direction:column;gap:6px}
+@media (max-width:380px){.ring-wrap{grid-template-columns:1fr;justify-items:center}.grid3{grid-template-columns:1fr 1fr}}
+@media (prefers-reduced-motion:no-preference){.bar>i,.ring-fg{transition:all .4s ease}}
+</style>
+
+<div class="wrap" id="app"></div>
+
+<nav class="tabs" role="tablist">
+  <button data-tab="home" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>اليوم</button>
+  <button data-tab="food"><svg viewBox="0 0 24 24"><path d="M4 3v7a3 3 0 0 0 6 0V3M7 3v18M17 3c-2 0-3 3-3 6s1 4 3 4v8"/></svg>الأكل</button>
+  <button data-tab="weight"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M8 9a4 4 0 0 1 8 0M12 9l1.5-2"/></svg>الوزن</button>
+  <button data-tab="ex"><svg viewBox="0 0 24 24"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg>تمارين</button>
+  <button data-tab="coach"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.5"/></svg>المدرب</button>
+  <button data-tab="plan"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>الخطة</button>
+</nav>
+
+<script>
+/* ---------- قاعدة الأكلات (السعرات والبروتين للحصة) ---------- */
+const FOODS=[
+ ["خبز","خبز طابون (رغيف)",270,9],["خبز","خبز عربي كبير (رغيف)",250,8],["خبز","خبز عربي صغير",120,4],["خبز","خبز شراك (قطعة)",200,6],["خبز","خبز أسمر (رغيف)",190,8],["خبز","كعك بسمسم",300,9],["خبز","منقوشة زعتر",350,8],["خبز","فطيرة سبانخ",250,6],
+ ["فطور","حمص (صحن مع زيت)",350,12],["فطور","فول مدمس (صحن)",280,15],["فطور","فلافل (حبة)",55,2],["فطور","لبنة (ملعقتين)",100,5],["فطور","جبنة بيضاء (50غ)",160,9],["فطور","بيضة مسلوقة",75,6],["فطور","بيضة مقلية",95,6],["فطور","عجة بيض (بيضتين)",200,13],["فطور","زيت زيتون (ملعقة كبيرة)",120,0],["فطور","زعتر (ملعقة)",20,1],["فطور","زيتون (10 حبات)",50,0],["فطور","طحينة (ملعقة)",90,3],["فطور","حلاوة طحينية (30غ)",160,4],["فطور","مربى (ملعقة)",50,0],["فطور","شكشوكة (صحن)",300,14],
+ ["طبيخ","مسخن (ربع رغيف مع دجاج)",550,25],["طبيخ","مقلوبة (صحن)",600,25],["طبيخ","منسف (صحن)",750,35],["طبيخ","مجدرة (صحن)",400,14],["طبيخ","ملوخية مع رز",450,20],["طبيخ","رز أبيض (كوب)",205,4],["طبيخ","مفتول (صحن)",650,25],["طبيخ","ورق عنب (حبة)",35,1],["طبيخ","محشي كوسا (حبة)",90,4],["طبيخ","شوربة عدس (صحن)",230,13],["طبيخ","بامية باللحمة مع رز",500,22],["طبيخ","فاصولياء مع رز",480,18],["طبيخ","معكرونة (صحن)",400,13],["طبيخ","قدرة (صحن)",650,30],
+ ["لحوم","صدر دجاج مشوي (150غ)",250,46],["لحوم","ربع دجاجة مشوية",330,30],["لحوم","كباب (سيخ)",200,14],["لحوم","شيش طاووق (سيخ)",150,22],["لحوم","كفتة بالطحينة (صحن)",600,30],["لحوم","سمك مشوي (200غ)",280,40],["لحوم","تونة (علبة مصفاة)",130,28],["لحوم","لحمة مسلوقة (100غ)",250,26],
+ ["سريع","ساندويش فلافل",450,13],["سريع","شاورما دجاج",550,30],["سريع","شاورما لحمة",600,28],["سريع","برغر",550,28],["سريع","بطاطا مقلية (صحن وسط)",365,4],["سريع","بيتزا (قطعة)",285,12],["سريع","زنجر",600,27],["سريع","شيبس (كيس صغير)",160,2],
+ ["خضار","سلطة خضار بدون زيت",40,2],["خضار","سلطة عربية مع زيت",120,2],["خضار","فتوش (صحن)",200,4],["خضار","تبولة (صحن)",180,4],["خضار","خيار (حبة)",15,1],["خضار","بندورة (حبة)",22,1],["خضار","جزر (حبة)",25,1],
+ ["فواكه","تفاح (حبة)",95,0],["فواكه","موز (حبة)",105,1],["فواكه","برتقال (حبة)",62,1],["فواكه","عنب (كوب)",104,1],["فواكه","بطيخ (شريحة)",85,2],["فواكه","تمر (حبة)",23,0],["فواكه","تين (حبة)",37,0],["فواكه","رمان (حبة)",230,5],
+ ["حلو","كنافة (قطعة)",450,9],["حلو","بقلاوة (قطعة)",120,2],["حلو","قطايف مقلية (حبة)",200,4],["حلو","هريسة (قطعة)",250,3],["حلو","شوكولاتة (لوح صغير)",230,3],["حلو","بسكوت (3 حبات)",150,2],["حلو","مكسرات (حفنة 30غ)",175,6],["حلو","بزر (حفنة 30غ)",170,7],
+ ["مشروبات","شاي بسكر (ملعقتين)",35,0],["مشروبات","شاي بدون سكر",2,0],["مشروبات","قهوة عربي سادة",5,0],["مشروبات","قهوة تركي بسكر",40,0],["مشروبات","نسكافيه بحليب وسكر",120,3],["مشروبات","لبن رايب (كوب)",150,8],["مشروبات","حليب كامل (كوب)",150,8],["مشروبات","كولا (علبة)",140,0],["مشروبات","كولا دايت",1,0],["مشروبات","عصير برتقال (كوب)",110,2],["مشروبات","مشروب طاقة (علبة)",115,0]
+];
+const CATS=["الكل","خبز","فطور","طبيخ","لحوم","سريع","خضار","فواكه","حلو","مشروبات","أكلاتي"];
+const MEALS=["فطور","غداء","عشاء","سناك"];
+const ACT=[[1.2,"مكتبي (جلوس أغلب اليوم)"],[1.375,"خفيف (مشي بسيط يومياً)"],[1.55,"متوسط (رياضة 3-5 أيام)"]];
+
+/* ---------- الحالة والتخزين ---------- */
+const KEY="mizan-v1";
+const today=()=>dkey(new Date());
+function dkey(d){const z=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())}
+function addDays(k,n){const d=new Date(k+"T12:00:00");d.setDate(d.getDate()+n);return dkey(d)}
+function daysBetween(a,b){return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/864e5)}
+const DEF={profile:{name:"إسلام",sex:"m",age:36,height:173,activity:1.2,start:90,target:75,pace:0.5,stepGoal:8000,startDate:today()},
+  weights:[{d:today(),w:90}],food:{},water:{},walk:{},steps:{},workouts:{},exLevel:0,custom:[]};
+let S;
+function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):JSON.parse(JSON.stringify(DEF))}catch(e){S=JSON.parse(JSON.stringify(DEF))}
+  for(const k in DEF) if(S[k]===undefined) S[k]=JSON.parse(JSON.stringify(DEF[k]));if(!S.profile.stepGoal)S.profile.stepGoal=8000}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(window.Android)try{Android.saveSummary(JSON.stringify(summary()))}catch(e){}}
+/* ملخص يقرأه تطبيق الأندرويد ليرسل الإشعارات والتطبيق مسكّر */
+function summary(){const C=calc(),k=today(),steps=S.steps[k]||0;
+  const dates=o=>Object.keys(o).filter(d=>(o[d]||[]).length).sort().pop()||"";
+  return{date:k,steps,stepGoal:S.profile.stepGoal||8000,water:S.water[k]||0,waterGoal:C.water,eaten:kcalOf(k),
+    budget:C.target+Math.round((walkKcal(steps)+exKcal(k))/2),lastWorkout:dates(S.workouts||{})||S.profile.startDate,
+    lastWeight:[...S.weights].map(x=>x.d).sort().pop()||""}}
+load();
+
+/* ---------- الحسابات ---------- */
+function curW(){const w=[...S.weights].sort((a,b)=>a.d<b.d?-1:1);return w.length?w[w.length-1].w:S.profile.start}
+function calc(){
+  const p=S.profile,w=curW();
+  const bmr=10*w+6.25*p.height-5*p.age+(p.sex==="m"?5:-161);
+  const tdee=bmr*p.activity;
+  const floor=p.sex==="m"?1500:1200;
+  const target=Math.max(Math.round((tdee-p.pace*7700/7)/10)*10,floor);
+  const bmi=w/((p.height/100)**2);
+  const left=Math.max(w-p.target,0);
+  const weeks=left/p.pace;
+  const goalDate=addDays(today(),Math.round(weeks*7));
+  return{bmr:Math.round(bmr),tdee:Math.round(tdee),target,protein:Math.round(1.6*p.target),
+    water:Math.round(w*35/250),bmi,left,weeks,goalDate,w,
+    healthy:[Math.round(18.5*(p.height/100)**2),Math.round(24.9*(p.height/100)**2)]}
+}
+const dayFood=k=>S.food[k]||[];
+const sum=(arr,f)=>arr.reduce((a,x)=>a+f(x),0);
+const kcalOf=k=>Math.round(sum(dayFood(k),x=>x.kcal));
+const walkKcal=st=>Math.round(st*0.045*curW()/90);
+function bmiLabel(b){return b<18.5?"نحافة":b<25?"وزن صحي":b<30?"زيادة وزن":"سمنة"}
+function fmtDate(k){const d=new Date(k+"T12:00:00");return d.toLocaleDateString("ar",{day:"numeric",month:"long",year:"numeric"})}
+function fmtShort(k){const d=new Date(k+"T12:00:00");return d.toLocaleDateString("ar",{day:"numeric",month:"short"})}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- واجهة ---------- */
+let tab="home",sheet=null;
+const app=document.getElementById("app");
+function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),1800)}
+function render(){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
+  app.innerHTML=({home:vHome,food:vFood,weight:vWeight,ex:vEx,coach:vCoach,plan:vPlan}[tab])();
+  document.querySelector(".sheet-bg")?.remove();
+  if(sheet) document.body.insertAdjacentHTML("beforeend",sheet());
+  const n=alerts().filter(a=>a[0]==="r").length,hb=document.querySelector('[data-tab="home"]');
+  hb.querySelector(".badge")?.remove();
+  if(n) hb.insertAdjacentHTML("beforeend",`<span class="badge num">${n}</span>`);
+}
+/* تحديث كل دقيقة حتى تظهر الإنذارات بوقتها */
+setInterval(()=>{const a=document.activeElement;if(!sheet&&!(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))&&!advBusy&&!P)render()},60000);
+
+/* ---------- الإنذارات: تقارن ما فعلته بما يجب أن تكون فعلته حتى هذه الساعة ---------- */
+function dayFrac(from,to){const d=new Date(),h=d.getHours()+d.getMinutes()/60;return Math.max(0,Math.min((h-from)/(to-from),1))}
+function alerts(){
+  const C=calc(),k=today(),h=new Date().getHours(),out=[];
+  /* المشي: أنت حر بوقته. التنبيه فقط إذا صار الوقت ضيق على إكمال هدف اليوم */
+  const steps=S.steps[k]||0,goal=S.profile.stepGoal||8000,miss=goal-steps,now=new Date(),hLeft=Math.max(23-(now.getHours()+now.getMinutes()/60),0),mins=Math.ceil(miss/100);
+  if(miss>0&&h>=17){
+    const tight=mins>hLeft*60*0.35||h>=21;
+    if(tight) out.push(["r","الوقت صار ضيق على المشي","باقي "+miss.toLocaleString("en")+" خطوة (حوالي "+mins+" دقيقة) وما ضل من اليوم إلا "+Math.floor(hLeft)+" ساعات. لازم تمشي الليلة."]);
+    else if(h>=19) out.push(["w","ما خلّصت مشي اليوم","باقي "+miss.toLocaleString("en")+" خطوة، حوالي "+mins+" دقيقة. اختار أي وقت يناسبك قبل النوم."]);
+  }
+  const water=S.water[k]||0,expW=Math.floor(C.water*dayFrac(8,22));
+  if(water<expW-1) out.push([water<expW-3?"r":"w","الماء متأخر","شربت "+water+" كاسات والمفروض "+expW+" لهلأ. اشرب كاستين الآن."]);
+  const items=dayFood(k),eaten=kcalOf(k),bonus=Math.round((walkKcal(steps)+exKcal(k))/2),budget=C.target+bonus;
+  if(eaten>budget) out.push(["r","تجاوزت سعرات اليوم","زيادة "+(eaten-budget)+" سعرة. ممنوع أي أكل إضافي اليوم إلا خضار وماء، أو امشِ "+Math.ceil((eaten-budget)/walkKcal(100))+" دقيقة لتعوّض."]);
+  else if(h<18&&eaten>budget-250&&eaten>0) out.push(["w","قربت تخلص سعراتك","باقي "+(budget-eaten)+" سعرة فقط لباقي اليوم. العشا لازم يكون خفيف جداً."]);
+  if(h>=14&&!items.length) out.push(["w","ما سجلت أي أكلة","إذا أكلت سجّلها الآن. الأكل اللي ما بنسجله هو اللي بيوقف النزول."]);
+  const prot=sum(items,x=>x.p);
+  if(h>=18&&items.length&&prot<C.protein*0.6) out.push(["w","البروتين ناقص","أكلت "+Math.round(prot)+"غ من "+C.protein+"غ. خلّي العشا بيض أو لبن أو دجاج أو تونة."]);
+  if(items.some(x=>x.t&&x.t>=22)) out.push(["w","أكل متأخر","سجّلت أكل بعد الساعة 10 بالليل. سكّر المطبخ بعد العشا."]);
+  const exDays=Object.keys(S.workouts).filter(d=>(S.workouts[d]||[]).length).sort();
+  const lastEx=exDays.pop(),gap=lastEx?daysBetween(lastEx,k):daysBetween(S.profile.startDate,k);
+  if(gap>=3&&!(S.workouts[k]||[]).length) out.push(["w","صار لك "+gap+" أيام بدون تمارين","20 دقيقة تمارين بطن وخواصر اليوم، بأي وقت يناسبك."]);
+  const lastW=[...S.weights].sort((a,b)=>a.d<b.d?-1:1).pop();
+  if(lastW&&daysBetween(lastW.d,k)>=7) out.push(["w","ما وزنت حالك من "+daysBetween(lastW.d,k)+" يوم","وزن الأسبوع مطلوب. سجّله بكرة الصبح قبل الفطور."]);
+  return out;
+}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;closeSheet();render();scrollTo(0,0)});
+
+function ring(eaten,target){
+  const r=56,c=2*Math.PI*r,pct=Math.min(eaten/target,1),over=eaten>target;
+  return `<svg viewBox="0 0 132 132" role="img" aria-label="سعرات اليوم">
+   <circle cx="66" cy="66" r="${r}" stroke="var(--line)" stroke-width="12" fill="none"/>
+   <circle class="ring-fg" cx="66" cy="66" r="${r}" stroke="${over?"var(--sumac)":"var(--olive)"}" stroke-width="12" fill="none" stroke-linecap="round"
+     stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct)}" transform="rotate(-90 66 66)"/>
+   <text x="66" y="62" text-anchor="middle" class="ring-center" font-size="24" font-weight="700" fill="var(--fg)">${Math.abs(target-eaten)}</text>
+   <text x="66" y="84" text-anchor="middle" font-size="12" fill="var(--muted)">${over?"زيادة":"متبقي"}</text></svg>`
+}
+
+function vHome(){
+  const C=calc(),k=today(),eaten=kcalOf(k),steps=S.steps[k]||0,goal=S.profile.stepGoal,burn=walkKcal(steps),bonus=Math.round((burn+exKcal(k))/2);
+  const AL=alerts();
+  const budget=C.target+bonus,prot=Math.round(sum(dayFood(k),x=>x.p)),water=S.water[k]||0;
+  const meals=new Set(dayFood(k).map(x=>x.meal)).size;
+  const lost=(S.profile.start-C.w),totalToLose=S.profile.start-S.profile.target;
+  const prog=totalToLose>0?Math.max(0,Math.min(lost/totalToLose,1)):0;
+  // آخر 7 أيام
+  const days=[...Array(7)].map((_,i)=>addDays(k,i-6));
+  const maxK=Math.max(C.target*1.3,...days.map(kcalOf));
+  const bw=34,gap=12,H=110,Wd=7*bw+6*gap;
+  const bars=days.map((d,i)=>{const v=kcalOf(d),h=v/maxK*H,x=Wd-(i+1)*bw-i*gap;
+    return `<rect x="${x}" y="${H-h+4}" width="${bw}" height="${Math.max(h,2)}" rx="5" fill="${v>C.target?"var(--sumac)":v?"var(--olive)":"var(--line)"}"/>
+    <text x="${x+bw/2}" y="${H+20}" text-anchor="middle">${new Date(d+"T12:00:00").toLocaleDateString("ar",{weekday:"short"})}</text>`}).join("");
+  const ty=H-C.target/maxK*H+4;
+  return `
+  <header class="top"><h1>ميزان</h1><span class="muted small">${fmtDate(k)}</span></header>
+  ${AL.length?`<section class="card alarm" role="alert"><div class="row between"><h2>${AL.some(a=>a[0]==="r")?"إنذار: أنت مقصّر":"انتبه"}</h2><span class="pill warn">${AL.length}</span></div>
+    ${AL.map(x=>`<div class="advice ${x[0]}"><i></i><div><b>${esc(x[1])}</b><div class="small">${esc(x[2])}</div></div></div>`).join("")}</section>`
+   :`<section class="card ok"><b>ملتزم حتى الآن 👍</b><span class="small muted">كل المطلوب لهذه الساعة منجز. كمّل.</span></section>`}
+  <section class="card">
+    <div class="ring-wrap">${ring(eaten,budget)}
+      <div class="grid2">
+        <div class="stat"><b>${budget}</b><span>هدف اليوم</span></div>
+        <div class="stat"><b>${eaten}</b><span>أكلت</span></div>
+        <div class="stat"><b>${bonus}</b><span>مكافأة الحركة</span></div>
+        <div class="stat"><b>${prot}<small class="muted"> / ${C.protein}غ</small></b><span>بروتين</span></div>
+      </div></div>
+    <div class="row between"><span class="small muted">عدد مرات الأكل اليوم: <b class="num">${meals}</b></span>
+      <button class="btn-main" data-act="open-add">+ أضف أكلة</button></div>
+    <button data-act="go-adv">📷 اسألني قبل ما تاكل</button>
+  </section>
+  <section class="card">
+    <div class="row between"><h2>الماء</h2><span class="num">${water} / ${C.water} كاسات</span></div>
+    <div class="cups">${[...Array(Math.max(C.water,water))].map((_,i)=>`<button class="cup ${i<water?"on":""}" data-act="water" data-n="${i+1}" aria-label="كاس ${i+1}"></button>`).join("")}</div>
+    <span class="small muted">الكاس = 250 مل. اشرب كاسة قبل كل أكلة، يقلل الجوع.</span>
+  </section>
+  <section class="card" id="steps-card">
+    <div class="row between"><h2>المشي</h2><span class="num">${steps.toLocaleString("en")} / ${goal.toLocaleString("en")} خطوة</span></div>
+    <div class="bar"><i style="width:${Math.min(steps/goal*100,100)}%"></i></div>
+    <div class="small muted">${steps>=goal?"خلّصت هدف اليوم 👏":"باقي "+(goal-steps).toLocaleString("en")+" خطوة، امشيها بالوقت اللي يناسبك"} · حرقت ${burn} سعرة</div>
+    <div class="grid3">
+      <label style="grid-column:span 2">عداد خطوات جوالك<input id="st" type="number" inputmode="numeric" placeholder="مثلاً 4250" value="${steps||""}"></label>
+      <button class="btn-main" data-act="set-steps" style="align-self:end">تحديث</button>
+    </div>
+    ${window.Android?(health==="ok"?`<span class="small" style="color:var(--olive)">● الخطوات تُقرأ تلقائياً من جوالك</span>`
+      :`<div class="advice w"><i></i><div class="small">${health==="unavailable"?"Health Connect غير مدعوم على جوالك، أدخل الخطوات يدوياً.":health==="update_required"?"ثبّت تطبيق Health Connect من Play Store حتى تنقرأ خطواتك تلقائياً.":"اربط التطبيق بـ Health Connect حتى تنقرأ خطواتك تلقائياً."}
+      ${health!=="unavailable"?`<div style="margin-top:6px"><button class="btn-main btn-sm" data-act="hc-connect">${health==="update_required"?"تثبيت Health Connect":"اربط الخطوات"}</button></div>`:""}</div></div>`):""}
+    <div class="row">${[500,1000,2000].map(m=>`<button class="btn-sm" data-act="add-steps" data-m="${m}">+${m.toLocaleString("en")}</button>`).join("")}<span class="small muted">كل 10 دقايق مشي ≈ 1000 خطوة</span></div>
+  </section>
+  <section class="card">
+    <div class="row between"><h2>التقدم نحو ${S.profile.target} كغ</h2><span class="pill">${(prog*100).toFixed(0)}٪</span></div>
+    <div class="bar"><i style="width:${prog*100}%"></i></div>
+    <div class="grid3">
+      <div class="stat"><b>${C.w}</b><span>الوزن الحالي</span></div>
+      <div class="stat"><b>${lost>0?lost.toFixed(1):"0"}</b><span>نزلت (كغ)</span></div>
+      <div class="stat"><b>${C.left.toFixed(1)}</b><span>باقي (كغ)</span></div>
+    </div>
+    <span class="small muted">بهذا المعدل توصل تقريباً في ${fmtDate(C.goalDate)}.</span>
+  </section>
+  <section class="card">
+    <h2>آخر 7 أيام</h2>
+    <svg class="chart" viewBox="0 0 ${Wd} ${H+28}">${bars}
+      <line x1="0" x2="${Wd}" y1="${ty}" y2="${ty}" stroke="var(--muted)" stroke-dasharray="4 4"/>
+      </svg>
+    <span class="small muted">الخط المتقطع = هدفك (${C.target} سعرة). الأحمر = يوم تجاوزت فيه الهدف.</span>
+  </section>`;
+}
+
+function vFood(){
+  const k=foodDay;
+  const items=dayFood(k);
+  const groups=MEALS.map(m=>{const g=items.filter(x=>x.meal===m);if(!g.length)return"";
+    return `<div class="meal-h">${m} · ${Math.round(sum(g,x=>x.kcal))} سعرة</div>`+g.map(x=>`
+      <div class="item"><div class="nm">${esc(x.name)}${x.q!==1?` <span class="muted small">×${x.q}</span>`:""}<div class="small muted">${Math.round(x.p)}غ بروتين</div></div>
+      <div class="row"><span class="num">${Math.round(x.kcal)}</span><button class="x" data-act="del-food" data-id="${x.id}" aria-label="حذف">×</button></div></div>`).join("")}).join("");
+  const C=calc(),eaten=kcalOf(k);
+  return `
+  <header class="top"><h1>دفتر الأكل</h1></header>
+  ${vAdvisor()}
+  <section class="card">
+    <div class="row between">
+      <button class="btn-sm" data-act="day" data-n="-1">‹ السابق</button>
+      <b>${k===today()?"اليوم":fmtDate(k)}</b>
+      <button class="btn-sm" data-act="day" data-n="1" ${k===today()?"disabled":""}>التالي ›</button></div>
+    <div class="row between"><span>المجموع <b class="num">${eaten}</b> من ${C.target}</span>
+      <span class="pill ${eaten>C.target?"warn":""}">${eaten>C.target?"زيادة "+(eaten-C.target):"متبقي "+(C.target-eaten)}</span></div>
+    <button class="btn-main" data-act="open-add">+ أضف أكلة</button>
+    ${items.length?`<div class="list">${groups}</div>`:`<div class="empty">ما سجلت أكل لهذا اليوم.<br>اضغط «أضف أكلة» واختر من الأكلات الفلسطينية الجاهزة أو أضف أكلتك.</div>`}
+  </section>
+  <section class="card">
+    <h2>أكلاتي الخاصة</h2>
+    <span class="small muted">أكلة مش موجودة بالقائمة؟ أضفها مرة وتلاقيها دايماً تحت «أكلاتي».</span>
+    <div class="grid3">
+      <label style="grid-column:span 3">الاسم<input id="cn" placeholder="مثلاً: صحن فريكة"></label>
+      <label>السعرات<input id="ck" type="number" inputmode="numeric" placeholder="400"></label>
+      <label>بروتين (غ)<input id="cp" type="number" inputmode="numeric" placeholder="15"></label>
+      <button class="btn-main" data-act="add-custom" style="align-self:end">حفظ</button>
+    </div>
+    ${S.custom.length?`<div class="list">${S.custom.map((c,i)=>`<div class="item"><span>${esc(c[1])}</span><div class="row"><span class="num">${c[2]}</span><button class="x" data-act="del-custom" data-i="${i}" aria-label="حذف">×</button></div></div>`).join("")}</div>`:""}
+  </section>`;
+}
+let foodDay=today();
+
+/* ---------- المستشار: اكتب أو صوّر الأكلة قبل ما تاكلها ---------- */
+let SAMPLE=null,canImg=false,advText="",advPhoto=null,advURL="",advBusy=false,advRes=null,advErr="",advCtl=null;
+if(window.claude?.use) claude.use("sample").then(async s=>{SAMPLE=s;if(s){const l=await s.limits().catch(()=>null);canImg=!!l?.images}render()});
+function vAdvisor(){
+  if(!SAMPLE&&!S.apiKey) return `<section class="card" id="adv"><h2>اسألني قبل ما تاكل</h2><div class="empty">${window.Android?"لتشغيل المستشار داخل التطبيق ضع مفتاح Anthropic API بصفحة «الخطة».":"المستشار يعمل عند فتح التطبيق من داخل Claude."} واستخدم «أضف أكلة» بالأسفل.</div></section>`;
+  const camOK=canImg||!!S.apiKey;
+  const r=advRes,V={go:"كُلها",reduce:"كُل نصها أو أقل",stop:"لا تاكلها الآن"};
+  return `<section class="card" id="adv">
+    <h2>اسألني قبل ما تاكل</h2>
+    <span class="small muted">اكتب شو ناوي تاكل أو صوّر الصحن، وأنا بحكيلك تاكله ولا لأ وكم.</span>
+    <textarea id="adv-text" rows="2" placeholder="مثلاً: صحن مقلوبة دجاج مع لبن وسلطة">${esc(advText)}</textarea>
+    ${camOK?`<label class="row" style="flex-direction:row;color:var(--fg)"><input id="adv-photo" type="file" accept="image/*" capture="environment" style="width:auto">صوّر الأكلة</label>`:""}
+    ${advURL?`<img class="thumb" src="${advURL}" alt="صورة الأكلة"><button class="btn-sm" data-act="adv-clear-photo">إزالة الصورة</button>`:""}
+    <div class="row"><button class="btn-main" data-act="adv-ask" ${advBusy?"disabled":""}>${advBusy?"أحلّل الأكلة...":"احكيلي شو أعمل"}</button>
+      ${advBusy?`<button class="btn-sm" data-act="adv-stop">إيقاف</button>`:""}</div>
+    ${advErr?`<div class="advice r"><i></i><div class="small">${esc(advErr)}</div></div>`:""}
+    ${r?`<div class="verdict ${r.verdict}">
+      <div class="row between"><h3>${V[r.verdict]||""}</h3><span class="num">${Math.round(r.kcal)} سعرة · ${Math.round(r.protein)}غ بروتين</span></div>
+      <b>${esc(r.meal)}</b>
+      <div>${esc(r.headline)}</div>
+      ${(r.advice||[]).length?`<ul class="tips">${r.advice.map(a=>`<li>${esc(a)}</li>`).join("")}</ul>`:""}
+      ${r.swap?`<div class="small"><b>البديل الأفضل:</b> ${esc(r.swap)}</div>`:""}
+      <div class="row"><button class="btn-main btn-sm" data-act="adv-log" data-q="1">أكلتها كاملة، سجّلها</button>
+        <button class="btn-sm" data-act="adv-log" data-q="0.5">أكلت النص</button>
+        <button class="btn-sm" data-act="adv-log" data-q="${r.portion||0.5}">أكلت الكمية المقترحة</button></div>
+    </div>`:""}
+  </section>`;
+}
+async function askAdvisor(){
+  if(!advText.trim()&&!advPhoto){advErr="اكتب اسم الأكلة أو صوّرها أولاً.";render();return}
+  const C=calc(),k=today(),eaten=kcalOf(k),steps=S.steps[k]||0,budget=C.target+Math.round((walkKcal(steps)+exKcal(k))/2);
+  const prot=Math.round(sum(dayFood(k),x=>x.p)),now=new Date();
+  const prompt=`أنت مدرب تغذية صارم لكن محترم، تتكلم باللهجة الفلسطينية البسيطة. المستخدم رجل عمره ${S.profile.age} سنة، طوله ${S.profile.height} سم، وزنه ${C.w} كغ، هدفه ${S.profile.target} كغ، شغله مكتبي.
+وضعه اليوم: الساعة ${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")}. هدف السعرات ${budget}، أكل ${eaten} حتى الآن، الباقي ${budget-eaten}. البروتين ${prot}غ من ${C.protein}غ. الخطوات ${steps} من ${S.profile.stepGoal}.
+أكل اليوم: ${dayFood(k).map(x=>x.name).join("، ")||"لا شيء بعد"}.
+الأكلة التي ينوي أكلها: ${advText.trim()||"(انظر الصورة)"}${advPhoto?"\nمرفقة صورة للصحن، قدّر الكمية من الصورة.":""}
+قدّر السعرات والبروتين بواقعية للمطبخ الفلسطيني (انتبه لزيت الزيتون والخبز). قرّر: go إذا تناسب الباقي، reduce إذا لازم يقلل الكمية، stop إذا رح يتجاوز كثيراً أو الوقت متأخر جداً.
+أجب بـ JSON فقط بهذا الشكل:
+{"meal":"اسم مختصر للأكلة","kcal":0,"protein":0,"verdict":"go|reduce|stop","portion":1,"headline":"جملة واحدة مباشرة","advice":["نصيحة عملية قصيرة","..."],"swap":"بديل أخف أو تعديل بسيط"}
+portion هو الجزء المسموح أكله (مثلاً 0.5). advice من 2 إلى 4 نقاط.`;
+  advBusy=true;advErr="";advRes=null;render();advCtl=new AbortController();
+  try{
+    const res=SAMPLE?await SAMPLE.json(prompt,{signal:advCtl.signal,images:advPhoto&&canImg?[advPhoto]:undefined,cache:false}):await apiJSON(prompt,advPhoto,advCtl.signal);
+    if(!res||typeof res.kcal!=="number") throw {code:"invalid_json"};
+    advRes=res;
+  }catch(e){
+    advErr={not_granted:"لازم تسمح للتطبيق باستخدام Claude حتى يشتغل المستشار.",rate_limited:"طلبات كثيرة، جرّب بعد شوي.",image_rejected:"الصورة ما انقرأت، جرّب صورة ثانية.",invalid_json:"ما فهمت الرد، اضغط مرة ثانية.",cancelled:"",bad_key:"مفتاح API غير صحيح أو بدون رصيد. راجعه بصفحة الخطة.",offline:"ما في إنترنت.",bad_request:"الطلب ما انقبل، جرّب صورة أصغر أو اكتب الأكلة."}[e.code]??"صار خطأ بالاتصال، جرّب مرة ثانية.";
+    if(e.code==="not_granted"||e.code==="sampling_disabled") SAMPLE=null;
+  }finally{advBusy=false;render()}
+}
+
+
+/* ورقة إضافة أكلة */
+let fq="",fc="الكل",fsel=null,fmeal=null;
+function autoMeal(){const h=new Date().getHours();return h<11?"فطور":h<16?"غداء":h<21?"عشاء":"سناك"}
+function allFoods(){return FOODS.concat(S.custom.map(c=>["أكلاتي",c[1],c[2],c[3]]))}
+function sheetAdd(){
+  const list=allFoods().filter(f=>(fc==="الكل"||f[0]===fc)&&(!fq||f[1].includes(fq)));
+  return `<div class="sheet-bg" data-act="close-bg"><div class="sheet" role="dialog" aria-label="أضف أكلة">
+    <div class="row between"><h2>أضف أكلة</h2><button class="x" data-act="close" aria-label="إغلاق">×</button></div>
+    <div class="chips">${MEALS.map(m=>`<button class="chip" aria-pressed="${fmeal===m}" data-act="meal" data-m="${m}">${m}</button>`).join("")}</div>
+    <input id="fsearch" placeholder="ابحث: حمص، مسخن، شاي..." value="${esc(fq)}">
+    <div class="chips">${CATS.map(c=>`<button class="chip" aria-pressed="${fc===c}" data-act="cat" data-c="${c}">${c}</button>`).join("")}</div>
+    <div class="list">${list.length?list.map(f=>{const id=f[1];const open=fsel===id;
+      return `<div class="item" style="flex-direction:column;align-items:stretch"><button data-act="pick" data-n="${esc(id)}" style="border:0;padding:0;background:transparent;text-align:start;display:flex;justify-content:space-between;gap:10px">
+        <span>${esc(f[1])}</span><span class="num muted">${f[2]}</span></button>
+        ${open?`<div class="qty"><span class="small muted" style="align-self:center">الكمية:</span>${[0.5,1,1.5,2,3].map(q=>`<button class="btn-sm ${q===1?"btn-main":""}" data-act="add-food" data-n="${esc(id)}" data-q="${q}">${q===0.5?"½":q===1.5?"1½":q} (${Math.round(f[2]*q)})</button>`).join("")}</div>`:""}</div>`}).join("")
+      :`<div class="empty">ما في نتيجة. أضف الأكلة من «أكلاتي الخاصة» بصفحة الأكل.</div>`}</div>
+  </div></div>`;
+}
+function openSheet(){fq="";fc="الكل";fsel=null;fmeal=autoMeal();sheet=sheetAdd;render()}
+function closeSheet(){sheet=null;document.querySelector(".sheet-bg")?.remove()}
+
+function vWeight(){
+  const C=calc(),p=S.profile;
+  const ws=[...S.weights].sort((a,b)=>a.d<b.d?-1:1);
+  // الرسم البياني
+  const W=340,H=200,pl=34,pr=8,pt=10,pb=24;
+  const end=Math.max(daysBetween(p.startDate,today())+14,28);
+  const planEnd=Math.round((p.start-p.target)/p.pace*7);
+  const span=Math.min(Math.max(end,ws.length?daysBetween(p.startDate,ws[ws.length-1].d)+14:28),planEnd+14);
+  const vals=ws.map(x=>x.w).concat([p.start,p.start-p.pace*span/7>p.target?p.start-p.pace*span/7:p.target]);
+  const ymax=Math.ceil(Math.max(...vals)+1),ymin=Math.floor(Math.min(...vals)-1);
+  const X=d=>pl+(W-pl-pr)*(1-d/span); // RTL: البداية يمين
+  const Y=v=>pt+(H-pt-pb)*(ymax-v)/(ymax-ymin);
+  const planPts=[[0,p.start],[Math.min(span,planEnd),p.start-p.pace*Math.min(span,planEnd)/7]];
+  const pts=ws.map(x=>[daysBetween(p.startDate,x.d),x.w]).filter(x=>x[0]>=0&&x[0]<=span);
+  let grid="";const step=Math.max(1,Math.round((ymax-ymin)/4));
+  for(let v=ymin;v<=ymax;v+=step) grid+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${pl-6}" y="${Y(v)+3}" text-anchor="end">${v}</text>`;
+  const ty=Y(p.target);
+  const chart=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="منحنى الوزن">${grid}
+    ${p.target>=ymin?`<line x1="${pl}" x2="${W-pr}" y1="${ty}" y2="${ty}" stroke="var(--olive)" stroke-dasharray="2 4"/>`:""}
+    <polyline points="${planPts.map(q=>X(q[0])+","+Y(q[1])).join(" ")}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="6 5"/>
+    ${pts.length>1?`<polyline points="${pts.map(q=>X(q[0])+","+Y(q[1])).join(" ")}" fill="none" stroke="var(--olive)" stroke-width="2.5" stroke-linejoin="round"/>`:""}
+    ${pts.map((q,i)=>`<circle cx="${X(q[0])}" cy="${Y(q[1])}" r="${i===pts.length-1?5:3}" fill="var(--olive)"/>`).join("")}
+    <text x="${W-pr}" y="${H-6}" text-anchor="end">${fmtShort(p.startDate)}</text>
+    <text x="${pl}" y="${H-6}" text-anchor="start">${fmtShort(addDays(p.startDate,span))}</text></svg>`;
+  return `
+  <header class="top"><h1>الوزن</h1><span class="pill ${C.bmi>=25?"warn":""}">${bmiLabel(C.bmi)} · ${C.bmi.toFixed(1)}</span></header>
+  <section class="card">
+    <h2>سجّل وزنك</h2>
+    <span class="small muted">مرة بالأسبوع، نفس اليوم، الصبح بعد الحمام وقبل الأكل.</span>
+    <div class="grid3">
+      <label>الوزن (كغ)<input id="wv" type="number" step="0.1" inputmode="decimal" value="${C.w}"></label>
+      <label>التاريخ<input id="wd" type="date" value="${today()}" max="${today()}"></label>
+      <button class="btn-main" data-act="add-weight" style="align-self:end">حفظ</button>
+    </div>
+  </section>
+  <section class="card">
+    <h2>المنحنى</h2>${chart}
+    <div class="row small muted"><span>━ وزنك الفعلي</span><span>╌ الخطة (${p.pace} كغ/أسبوع)</span><span>⋯ الهدف ${p.target}</span></div>
+  </section>
+  <section class="card">
+    <h2>السجل</h2>
+    <div class="list">${ws.slice().reverse().map((x,i,a)=>{const prev=a[i+1];const d=prev?x.w-prev.w:0;
+      return `<div class="item"><span>${fmtDate(x.d)}</span><div class="row"><b class="num">${x.w}</b>
+      ${prev?`<span class="small num" style="color:${d<=0?"var(--olive)":"var(--sumac)"}">${d>0?"+":""}${d.toFixed(1)}</span>`:""}
+      <button class="x" data-act="del-weight" data-d="${x.d}" aria-label="حذف">×</button></div></div>`}).join("")}</div>
+  </section>`;
+}
+
+/* ---------- داخل تطبيق الأندرويد ---------- */
+let health="";
+window.onHealthStatus=st=>{if(health!==st){health=st;softRender()}};
+window.onNativeSteps=n=>{const k=today();n=Math.round(+n||0);if(n>(S.steps[k]||0)){S.steps[k]=n;save();softRender()}};
+function softRender(){const a=document.activeElement;if(!P&&!advBusy&&!(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)))render()}
+window.onBack=()=>{if(P){finishWorkout(false);return true}if(sheet){closeSheet();return true}if(tab!=="home"){tab="home";render();scrollTo(0,0);return true}return false};
+if(window.Android){const ask=()=>{try{Android.requestSteps()}catch(e){}};
+  setTimeout(()=>{ask();save()},300);setInterval(ask,60000);
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)ask()})}
+/* المستشار داخل الأندرويد يستخدم مفتاح Anthropic API الخاص بك */
+function imgToB64(file){return new Promise((ok,no)=>{const u=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>{const m=1024,sc=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement("canvas");
+    c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+    URL.revokeObjectURL(u);ok(c.toDataURL("image/jpeg",0.82).split(",")[1])};im.onerror=()=>no({code:"image_rejected"});im.src=u})}
+async function apiJSON(prompt,img,signal){
+  const content=[];if(img)content.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:await imgToB64(img)}});
+  content.push({type:"text",text:prompt+"\nاكتب JSON فقط بدون أي نص قبله أو بعده."});
+  let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal,headers:{"content-type":"application/json","x-api-key":S.apiKey,
+    "anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify({model:"claude-sonnet-5-5",max_tokens:1200,messages:[{role:"user",content}]})})}
+  catch(e){throw{code:e.name==="AbortError"?"cancelled":"offline"}}
+  if(!r.ok)throw{code:r.status===401||r.status===403?"bad_key":r.status===429?"rate_limited":r.status===400?"bad_request":"upstream_error"};
+  const j=await r.json(),t=(j.content||[]).map(c=>c.text||"").join(""),m=t.match(/\{[\s\S]*\}/);
+  if(!m)throw{code:"invalid_json"};return JSON.parse(m[0])}
+
+/* ---------- التمارين ---------- */
+const EX={
+ warm:["مشي بالمكان مع رفع الركب","ارفع ركبتك لمستوى الخصر بالتناوب، وحرّك إيديك مع كل خطوة."],
+ squat:["سكوات على الكرسي","قف قدام كرسي، انزل لورا كأنك بدك تقعد، المس الكرسي بخفة وارجع اوقف. الظهر مستقيم والركب ما تتجاوز أصابع الرجلين."],
+ plankK:["بلانك على الركب","انبطح على الكوعين والركب، الجسم خط مستقيم من الراس للركب. شد بطنك كأنك بتستعد لضربة، وتنفّس طبيعي."],
+ plank:["بلانك كامل","على الكوعين وأصابع الرجلين، الجسم خط مستقيم. لا ترفع الحوض ولا تنزّله."],
+ deadbug:["الحشرة الميتة","استلقِ على ظهرك، ارفع إيديك للسقف وركبك 90 درجة. مد إيد ورجل معاكسة ببطء ورجّعهم. أسفل ظهرك ملزوق بالأرض."],
+ bicycle:["الدراجة البطيئة","استلقِ، إيديك ورا راسك بدون ما تشد رقبتك. قرّب الكوع من الركبة المعاكسة وامدد الرجل الثانية. ببطء، هذا للخواصر."],
+ heel:["لمس الكعب","استلقِ والركب مثنية، ارفع كتافك شوي عن الأرض، والمس كعب اليمين بإيدك اليمين ثم الشمال. حركة جانبية للخواصر."],
+ sideL:["بلانك جانبي (يمين)","على الكوع اليمين وجنب الرجل (أو الركبة للمبتدئ)، ارفع الحوض لحتى يصير جسمك خط مستقيم."],
+ sideR:["بلانك جانبي (شمال)","نفس الحركة على الجنب الثاني."],
+ standObl:["كوع لركبة واقف","قف وإيديك ورا راسك، ارفع الركبة لجنب وقرّب الكوع منها. بدّل الجهتين. ممتازة للخواصر وخفيفة على الظهر."],
+ climber:["متسلق الجبل البطيء","وضعية الضغط، قرّب ركبة للصدر ورجّعها وبدّل. ابدأ ببطء وزيد السرعة مع الوقت."],
+ bridge:["جسر الحوض","استلقِ والركب مثنية، ارفع الحوض لفوق وشد المؤخرة ثانيتين ونزّل. بيقوّي أسفل الظهر اللي بيتعب من القعدة."],
+ birddog:["الكلب والطير","على إيديك وركبك، مد إيد قدام ورجل معاكسة لورا، اثبت ثانيتين ورجّع. بطء وتوازن."],
+ wallPush:["ضغط على الحيط","إيديك على الحيط بعرض الكتفين، قرّب صدرك للحيط وارجع. كل ما بعدت رجليك عن الحيط بتصعب."],
+ twist:["لف الجذع واقف","قف والركب مثنية شوي، لف كتافك يمين وشمال بسرعة متوسطة والحوض ثابت."],
+ seatVac:["شد البطن على الكرسي","وأنت قاعد ظهرك مستقيم، اسحب بطنك لجوا لأقصى حد واثبت 10 ثواني وأنت بتتنفس بهدوء. كرر."],
+ seatKnee:["رفع الركب على الكرسي","امسك طرف الكرسي، ارفع الركبتين سوا لصدرك ونزّل بدون ما تلمس الأرض."],
+ seatTwist:["لف على الكرسي","اقعد على طرف الكرسي، ميل لورا شوي، ولف الكتاف يمين وشمال وبطنك مشدود."]
+};
+const WORKOUTS=[
+ {id:"belly",name:"البطن",desc:"تقوية عضلات البطن الأمامية وشدّها",list:["warm","plankK","deadbug","climber","bridge","plank","squat"]},
+ {id:"sides",name:"الخواصر",desc:"عضلات الجنب والخصر",list:["warm","standObl","bicycle","heel","sideL","sideR","twist"]},
+ {id:"burn",name:"حرق كامل",desc:"أكثر حرق للسعرات، كل الجسم",list:["warm","squat","wallPush","climber","standObl","bridge","birddog"]},
+ {id:"desk",name:"على الكرسي بالمكتب",desc:"7 دقايق بين الشغل، بدون ما تقوم",list:["seatVac","seatKnee","seatTwist","seatVac","seatKnee","seatTwist"],fixed:[40,15,2]}
+];
+const LEVELS=[["مبتدئ",30,30,2],["متوسط",40,20,3],["متقدم",45,15,4]];
+function exKcal(k){return Math.round(sum(S.workouts[k]||[],x=>x.kcal))}
+function wPlan(w){const L=LEVELS[S.exLevel||0];const [work,rest,rounds]=w.fixed||[L[1],L[2],L[3]];
+  const secs=(work+rest)*w.list.length*rounds;return{work,rest,rounds,mins:Math.round(secs/60)}}
+function vEx(){
+  const k=today(),done=S.workouts[k]||[];
+  const monday=addDays(k,-((new Date(k+"T12:00:00").getDay()+1)%7)); // الأسبوع يبدأ السبت
+  const wk=[...Array(7)].map((_,i)=>addDays(monday,i));
+  const cnt=wk.filter(d=>(S.workouts[d]||[]).length).length;
+  return `
+  <header class="top"><h1>تمارين الكرش والخواصر</h1></header>
+  <section class="card">
+    <div class="row between"><h2>هذا الأسبوع</h2><span class="pill ${cnt<2?"warn":""}">${cnt} من 4 جلسات</span></div>
+    <div class="week">${wk.map(d=>`<span><i class="${(S.workouts[d]||[]).length?"on":""}"></i>${new Date(d+"T12:00:00").toLocaleDateString("ar",{weekday:"short"})}</span>`).join("")}</div>
+    ${done.length?`<span class="small">اليوم: ${done.map(x=>x.name).join("، ")} · حرقت ${exKcal(k)} سعرة، نصها انضاف لأكلك.</span>`:`<span class="small muted">الهدف 3–4 جلسات بالأسبوع، بالوقت اللي يناسبك. يوم تمارين ويوم راحة أفضل.</span>`}
+  </section>
+  <section class="card">
+    <h2>مستواك</h2>
+    <div class="chips">${LEVELS.map((L,i)=>`<button class="chip" aria-pressed="${(S.exLevel||0)===i}" data-act="ex-level" data-i="${i}">${L[0]}</button>`).join("")}</div>
+    <span class="small muted">${LEVELS[S.exLevel||0][1]} ثانية تمرين و${LEVELS[S.exLevel||0][2]} راحة، ${LEVELS[S.exLevel||0][3]} جولات. ابدأ مبتدئ أول أسبوعين، وارفع لما تحس التمرين صار سهل.</span>
+  </section>
+  ${WORKOUTS.map(w=>{const pl=wPlan(w);return `<section class="card">
+    <div class="row between"><div><h2>${w.name}</h2><span class="small muted">${w.desc}</span></div><span class="pill">${pl.mins} دقيقة</span></div>
+    <div class="ex-list">${w.list.map((e,i)=>`<div class="ex"><span class="n">${i+1}</span><b>${EX[e][0]}</b><span class="how">${EX[e][1]}</span></div>`).join("")}</div>
+    <button class="btn-main" data-act="ex-start" data-id="${w.id}">ابدأ التمرين</button>
+  </section>`}).join("")}
+  <section class="card">
+    <h2>الحقيقة عن الكرش</h2>
+    <ul class="tips">
+      <li>ما في تمرين بيذوّب الدهن من مكان واحد. الكرش بينزل لما ينزل وزنك كله، والأكل هو 70٪ من الشغل.</li>
+      <li>تمارين البطن بتشدّ العضلة تحت الدهن، فلما ينزل الدهن بيبيّن بطنك مشدود مش مترهّل.</li>
+      <li>الكرش عند الرجال غالباً آخر شي بينزل. لا تيأس إذا الوزن نازل والكرش لسا.</li>
+      <li>قيس محيط خصرك عند السرّة كل أسبوعين، أحياناً بينزل أكثر من الوزن.</li>
+      <li>إذا عندك ألم ظهر أو ديسك، وقّف أي تمرين بيوجعك واستشر مختص.</li>
+    </ul>
+  </section>`;
+}
+/* مشغّل التمرين */
+let P=null,PT=null,actx=null;
+function beep(f=880,d=0.15){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=f;o.connect(g);g.connect(actx.destination);g.gain.value=0.15;o.start();o.stop(actx.currentTime+d)}catch(e){}}
+function startWorkout(id){
+  const w=WORKOUTS.find(x=>x.id===id),pl=wPlan(w),steps=[];
+  for(let r=0;r<pl.rounds;r++) w.list.forEach((e,i)=>{steps.push({type:"work",e,round:r+1,secs:pl.work});
+    if(!(r===pl.rounds-1&&i===w.list.length-1)) steps.push({type:"rest",e:w.list[(i+1)%w.list.length],round:r+1,secs:pl.rest})});
+  P={w,pl,steps,i:-1,left:5,paused:false,startedAt:Date.now(),worked:0};
+  try{navigator.wakeLock?.request("screen").then(l=>P&&(P.lock=l)).catch(()=>{})}catch(e){}
+  beep(660);drawPlayer();PT=setInterval(tick,1000);try{window.Android?.keepScreenOn(true)}catch(e){}
+}
+function tick(){
+  if(!P||P.paused)return;
+  P.left--;if(P.i>=0&&P.steps[P.i].type==="work")P.worked++;
+  if(P.left<=3&&P.left>0)beep(520,0.08);
+  if(P.left<=0){P.i++;if(P.i>=P.steps.length){finishWorkout(true);return}
+    P.left=P.steps[P.i].secs;beep(P.steps[P.i].type==="work"?880:440,0.25);drawPlayer();return}
+  const t=document.getElementById("p-left");if(t)t.textContent=P.left;
+}
+function drawPlayer(){
+  document.querySelector(".player")?.remove();if(!P)return;
+  const st=P.i<0?{type:"ready",e:P.steps[0].e,round:1}:P.steps[P.i];
+  const next=P.steps.slice(P.i+1).find(x=>x.type==="work");
+  const workIdx=P.steps.slice(0,P.i+1).filter(x=>x.type==="work").length,total=P.steps.filter(x=>x.type==="work").length;
+  const label={ready:"استعد",work:"تمرين",rest:"راحة، التالي"}[st.type];
+  document.body.insertAdjacentHTML("beforeend",`<div class="player ${st.type==="rest"?"rest":""}" role="dialog" aria-label="التمرين">
+    <div class="row between"><span class="phase">${P.w.name} · جولة ${st.round} من ${P.pl.rounds}</span><button class="x" data-act="ex-quit" aria-label="إنهاء">×</button></div>
+    <div class="bar"><i style="width:${workIdx/total*100}%"></i></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span class="phase">${label}</span>
+      <h2>${EX[st.e][0]}</h2>
+      <span class="muted">${EX[st.e][1]}</span>
+    </div>
+    <div class="big" id="p-left">${P.left}</div>
+    <span class="small muted" style="text-align:center">${next&&st.type==="work"?"بعده: "+EX[next.e][0]:"تنفّس، واشرب شوية ماء إذا بدك"}</span>
+    <div class="ctl"><button data-act="ex-skip">تخطّي</button><button class="btn-main" data-act="ex-pause">${P.paused?"كمّل":"إيقاف مؤقت"}</button><button data-act="ex-quit">إنهاء</button></div>
+  </div>`);
+}
+function finishWorkout(full){
+  clearInterval(PT);try{P.lock?.release()}catch(e){}try{window.Android?.keepScreenOn(false)}catch(e){}
+  const min=Math.max(1,Math.round(P.worked/60*10)/10),k=today();
+  if(P.worked>=60){const kcal=Math.round((P.w.id==="desk"?3:8)*min*curW()/90);
+    (S.workouts[k]=S.workouts[k]||[]).push({name:P.w.name,min,kcal:Math.round(kcal),full});save();
+    toast(full?"عاش! خلّصت التمرين":"انحفظ اللي عملته");beep(990,0.4)}
+  P=null;drawPlayer();render();
+}
+
+/* المدرب: يحلل السجل ويعطي نصيحة */
+function analysis(){
+  const C=calc(),p=S.profile,out=[];
+  const ws=[...S.weights].sort((a,b)=>a.d<b.d?-1:1);
+  const last7=[...Array(7)].map((_,i)=>addDays(today(),-i-1));
+  const logged=last7.filter(d=>dayFood(d).length);
+  const avgK=logged.length?Math.round(sum(logged,kcalOf)/logged.length):0;
+  const avgWater=sum(last7,d=>S.water[d]||0)/7, avgSteps=sum(last7,d=>S.steps[d]||0)/7;
+  if(ws.length<2) out.push(["","البداية","سجّل وزنك مرة كل أسبوع. بعد أسبوعين يقدر المدرب يحكم إذا الخطة ماشية أو لا."]);
+  else{
+    const first=ws[0],last=ws[ws.length-1],wk=Math.max(daysBetween(first.d,last.d)/7,0.01),rate=(first.w-last.w)/wk;
+    const recent=ws.filter(x=>daysBetween(x.d,last.d)<=21);
+    const rDrop=recent[0].w-last.w, rSpan=daysBetween(recent[0].d,last.d);
+    if(rSpan>=14&&rDrop<0.3) out.push(["r","الوزن ثابت آخر "+Math.round(rSpan/7)+" أسابيع","هذا طبيعي ويصير لكل الناس. شيك على النقاط تحت: غالباً السبب أكل مش مسجل، أو مشي قليل. لو كل شيء مضبوط، نزّل هدفك اليومي 100 سعرة لمدة أسبوعين."]);
+    else if(rate>1.1) out.push(["w","نازل بسرعة ("+rate.toFixed(1)+" كغ/أسبوع)","سرعة عالية. زيد أكلك شوي وركز على البروتين حتى ما تخسر عضل وما يرجع الوزن."]);
+    else if(rate>0) out.push(["","ماشي صح ("+rate.toFixed(1)+" كغ/أسبوع)","استمر على نفس النظام. الثبات أهم من السرعة."]);
+    else out.push(["r","الوزن ما نزل من البداية","أكلك الفعلي غالباً أعلى من المسجل. سجّل كل شيء لمدة أسبوع كامل حتى الشاي والزيت."]);
+  }
+  if(logged.length<5) out.push(["w","سجّلت أكلك "+logged.length+" أيام من آخر 7","التسجيل اليومي هو سر النجاح. حتى الأيام اللي بتاكل فيها كثير، سجّلها."]);
+  else if(avgK>C.target+150) out.push(["r","معدل أكلك "+avgK+" سعرة","أعلى من هدفك ("+C.target+") بـ "+(avgK-C.target)+". شوف وين بتروح السعرات: الخبز والزيت والحلو والشاي بالسكر أكثر شيء."]);
+  else if(avgK&&avgK<C.target-400) out.push(["w","معدل أكلك "+avgK+" سعرة","أقل من اللازم بكثير. الأكل القليل جداً يبطئ الحرق ويخليك تجوع وترجع تاكل كثير."]);
+  else if(avgK) out.push(["","معدل أكلك "+avgK+" سعرة","قريب من هدفك. ممتاز."]);
+  if(avgSteps<S.profile.stepGoal*0.75) out.push(["w","معدل مشيك "+Math.round(avgSteps).toLocaleString("en")+" خطوة يومياً","هدفك "+S.profile.stepGoal.toLocaleString("en")+". مشي بعد الغدا أو العشا أسهل وقت."]);
+  if(avgWater<C.water*0.7) out.push(["w","الماء قليل","معدلك "+avgWater.toFixed(1)+" كاسات من "+C.water+". العطش كثير مرات بنحسه جوع."]);
+  return out;
+}
+function vCoach(){
+  const a=analysis();
+  return `
+  <header class="top"><h1>المدرب</h1></header>
+  <section class="card"><h2>تحليل آخر أسبوع</h2>
+    ${a.map(x=>`<div class="advice ${x[0]}"><i></i><div><b>${esc(x[1])}</b><div class="small">${esc(x[2])}</div></div></div>`).join("")}
+  </section>
+  <section class="card"><h2>لأن أكلك بدون مواعيد</h2>
+    <ul class="tips">
+      <li>ثبّت <b>3 مواعيد</b> تقريبية: فطور قبل الشغل، غدا بعد الدوام، عشا خفيف قبل 9. الأكل «كل ما جعت» أكثر سبب للأكل الزايد.</li>
+      <li>الأكل بعد جوع شديد يخليك تاكل ضعف حاجتك. لا تفوّت الفطور إذا رح تتأخر على الغدا.</li>
+      <li>خلي عندك <b>سناك جاهز</b> بالمكتب: خيار، تفاحة، لبن، حفنة مكسرات صغيرة.</li>
+      <li>نص الصحن خضار، ربعه بروتين (دجاج، لحمة، بيض، عدس)، ربعه نشويات.</li>
+    </ul></section>
+  <section class="card"><h2>أكبر مصادر السعرات عندنا</h2>
+    <ul class="tips">
+      <li><b>الخبز</b>: رغيف الطابون 270 سعرة. رغيف واحد باليوم بدل اثنين يوفر لك وحده نص كيلو بالشهر تقريباً.</li>
+      <li><b>زيت الزيتون</b>: الملعقة 120 سعرة. صحن حمص أو مسخن فيه أحياناً 4–5 ملاعق.</li>
+      <li><b>الشاي والقهوة بالسكر</b>: 5 كاسات = 175 سعرة كل يوم.</li>
+      <li><b>المشروبات الغازية والعصير</b>: بدّلها بماء أو دايت.</li>
+    </ul></section>
+  <section class="card"><h2>شغل المكتب</h2>
+    <ul class="tips">
+      <li>قوم كل ساعة دقيقتين، خصوصاً وأنت على AutoCAD.</li>
+      <li>المشي 30–45 دقيقة بيحرق حوالي 150–250 سعرة.</li>
+      <li>النوم أقل من 6 ساعات يزيد الجوع بشكل واضح.</li>
+    </ul>
+    <span class="small muted">إذا عندك ضغط أو سكري أو أي دواء، استشر طبيبك قبل البدء.</span>
+  </section>`;
+}
+
+function vPlan(){
+  const C=calc(),p=S.profile;
+  return `
+  <header class="top"><h1>الخطة</h1></header>
+  <section class="card">
+    <h2>أرقامك</h2>
+    <div class="grid3">
+      <div class="stat"><b>${C.target}</b><span>سعرات يومياً</span></div>
+      <div class="stat"><b>${C.protein}غ</b><span>بروتين يومياً</span></div>
+      <div class="stat"><b>${C.water}</b><span>كاسات ماء</span></div>
+      <div class="stat"><b>${C.bmr}</b><span>حرق الجسم بالراحة</span></div>
+      <div class="stat"><b>${C.tdee}</b><span>حرقك اليومي</span></div>
+      <div class="stat"><b>${Math.ceil(C.weeks)}</b><span>أسبوع للهدف</span></div>
+    </div>
+    <span class="small muted">الوزن الصحي لطولك: ${C.healthy[0]}–${C.healthy[1]} كغ. الوصول المتوقع: ${fmtDate(C.goalDate)}.</span>
+  </section>
+  <section class="card">
+    <h2>بياناتك</h2>
+    <div class="grid2">
+      <label>الاسم<input id="p-name" value="${esc(p.name)}"></label>
+      <label>الجنس<select id="p-sex"><option value="m" ${p.sex==="m"?"selected":""}>ذكر</option><option value="f" ${p.sex==="f"?"selected":""}>أنثى</option></select></label>
+      <label>العمر<input id="p-age" type="number" value="${p.age}"></label>
+      <label>الطول (سم)<input id="p-height" type="number" value="${p.height}"></label>
+      <label>وزن البداية<input id="p-start" type="number" step="0.1" value="${p.start}"></label>
+      <label>الوزن الهدف<input id="p-target" type="number" step="0.1" value="${p.target}"></label>
+      <label>تاريخ البداية<input id="p-startDate" type="date" value="${p.startDate}"></label>
+      <label>سرعة النزول<select id="p-pace">${[[0.25,"ربع كيلو/أسبوع (سهل جداً)"],[0.5,"نص كيلو/أسبوع (مُوصى)"],[0.75,"¾ كيلو/أسبوع (صعب)"]].map(o=>`<option value="${o[0]}" ${p.pace==o[0]?"selected":""}>${o[1]}</option>`).join("")}</select></label>
+      <label>هدف الخطوات اليومي<input id="p-stepGoal" type="number" step="500" value="${p.stepGoal}"></label>
+      <label>طبيعة يومك<select id="p-activity">${ACT.map(o=>`<option value="${o[0]}" ${p.activity==o[0]?"selected":""}>${o[1]}</option>`).join("")}</select></label>
+    </div>
+    <button class="btn-main" data-act="save-profile">حفظ وإعادة الحساب</button>
+  </section>
+  ${window.Android?`<section class="card">
+    <h2>المستشار (مفتاح API)</h2>
+    <span class="small muted">داخل تطبيق الأندرويد يحتاج المستشار مفتاحك من console.anthropic.com. المفتاح يبقى على جوالك فقط، وكل سؤال يكلّف قروش قليلة من رصيدك هناك.</span>
+    <label>مفتاح Anthropic API<input id="apikey" type="password" autocomplete="off" placeholder="sk-ant-..." value="${esc(S.apiKey||"")}"></label>
+    <div class="row"><button class="btn-main" data-act="save-key">حفظ المفتاح</button>${S.apiKey?`<button class="btn-sm" data-act="del-key">حذف المفتاح</button>`:""}</div>
+  </section>`:""}
+  <section class="card">
+    <h2>نسخة احتياطية</h2>
+    <span class="small muted">انسخ بياناتك واحفظها بملاحظة أو واتساب، وارجع الصقها هنا على جهاز ثاني أو بعد تحويل التطبيق APK.</span>
+    <textarea id="bk" rows="3" placeholder="الصق النسخة هنا للاستيراد"></textarea>
+    <div class="row"><button data-act="export">نسخ بياناتي</button><button data-act="import">استيراد</button>
+      <button class="btn-danger" data-act="reset">مسح كل شيء</button></div>
+    <div id="confirm"></div>
+  </section>`;
+}
+
+/* ---------- الأحداث ---------- */
+document.addEventListener("change",e=>{
+  if(e.target.id==="adv-photo"){const f=e.target.files?.[0];if(f){if(advURL)URL.revokeObjectURL(advURL);advPhoto=f;advURL=URL.createObjectURL(f);render()}}
+});
+document.addEventListener("input",e=>{
+  if(e.target.id==="adv-text"){advText=e.target.value;return}
+  if(e.target.id==="fsearch"){fq=e.target.value.trim();const pos=e.target.selectionStart;render();const i=document.getElementById("fsearch");i.focus();i.setSelectionRange(pos,pos)}
+});
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;
+  const a=b.dataset.act,k=today();
+  if(a==="close-bg"&&e.target!==b)return;
+  switch(a){
+    case"open-add":if(tab!=="food")foodDay=k;openSheet();break;
+    case"close":case"close-bg":closeSheet();break;
+    case"meal":fmeal=b.dataset.m;render();break;
+    case"cat":fc=b.dataset.c;render();break;
+    case"pick":fsel=fsel===b.dataset.n?null:b.dataset.n;render();break;
+    case"add-food":{const f=allFoods().find(x=>x[1]===b.dataset.n),q=+b.dataset.q;
+      (S.food[foodDay]=S.food[foodDay]||[]).push({id:Date.now(),name:f[1],kcal:f[2]*q,p:f[3]*q,q,meal:fmeal,t:new Date().getHours()});
+      save();fsel=null;render();toast("أُضيف: "+f[1]);break}
+    case"del-food":S.food[foodDay]=dayFood(foodDay).filter(x=>x.id!=b.dataset.id);save();render();break;
+    case"day":{const n=addDays(foodDay,+b.dataset.n);if(n<=k){foodDay=n;render()}break}
+    case"water":{const n=+b.dataset.n;S.water[k]=(S.water[k]===n?n-1:n);save();render();break}
+    case"add-steps":S.steps[k]=(S.steps[k]||0)+ +b.dataset.m;save();render();toast("أحسنت، كمّل");break;
+    case"set-steps":{const v=+document.getElementById("st").value;if(v>=0&&v<100000){S.steps[k]=Math.round(v);save();render();toast("تحدّث عداد الخطوات")}break}
+    case"adv-ask":askAdvisor();break;
+    case"adv-stop":advCtl?.abort();break;
+    case"adv-clear-photo":if(advURL)URL.revokeObjectURL(advURL);advPhoto=null;advURL="";render();break;
+    case"adv-log":{const q=+b.dataset.q,r=advRes;if(!r)break;
+      (S.food[k]=S.food[k]||[]).push({id:Date.now(),name:r.meal,kcal:r.kcal*q,p:r.protein*q,q,meal:autoMeal(),t:new Date().getHours()});
+      save();advRes=null;advText="";if(advURL)URL.revokeObjectURL(advURL);advPhoto=null;advURL="";foodDay=k;render();toast("سُجّلت: "+r.meal);break}
+    case"ex-level":S.exLevel=+b.dataset.i;save();render();break;
+    case"ex-start":startWorkout(b.dataset.id);break;
+    case"ex-pause":P.paused=!P.paused;drawPlayer();break;
+    case"ex-skip":P.left=1;tick();break;
+    case"ex-quit":finishWorkout(false);break;
+    case"hc-connect":try{Android.connectHealth()}catch(e){}break;
+    case"save-key":S.apiKey=document.getElementById("apikey").value.trim();save();render();toast(S.apiKey?"حُفظ المفتاح":"حُذف المفتاح");break;
+    case"del-key":S.apiKey="";save();render();toast("حُذف المفتاح");break;
+    case"go-adv":tab="food";render();document.getElementById("adv")?.scrollIntoView({behavior:"smooth"});break;
+    case"add-custom":{const n=document.getElementById("cn").value.trim(),kc=+document.getElementById("ck").value,pr=+document.getElementById("cp").value||0;
+      if(!n||!kc){toast("اكتب الاسم والسعرات");break}
+      S.custom.push(["أكلاتي",n,kc,pr]);save();render();toast("حُفظت الأكلة");break}
+    case"del-custom":S.custom.splice(+b.dataset.i,1);save();render();break;
+    case"add-weight":{const w=+document.getElementById("wv").value,d=document.getElementById("wd").value||k;
+      if(!(w>30&&w<300)){toast("اكتب وزن صحيح");break}
+      S.weights=S.weights.filter(x=>x.d!==d);S.weights.push({d,w});save();render();toast("سُجّل الوزن");break}
+    case"del-weight":if(S.weights.length>1){S.weights=S.weights.filter(x=>x.d!==b.dataset.d);save();render()}else toast("لازم يبقى وزن واحد على الأقل");break;
+    case"save-profile":{const g=id=>document.getElementById("p-"+id).value;
+      Object.assign(S.profile,{name:g("name"),sex:g("sex"),age:+g("age"),height:+g("height"),start:+g("start"),target:+g("target"),startDate:g("startDate"),pace:+g("pace"),activity:+g("activity"),stepGoal:+g("stepGoal")||8000});
+      save();render();toast("حُفظت الخطة");break}
+    case"export":{const t=JSON.stringify(S,(k,v)=>k==="apiKey"?undefined:v),ta=document.getElementById("bk");ta.value=t;
+      navigator.clipboard?.writeText(t).then(()=>toast("نُسخت البيانات"),()=>{ta.select();toast("حدّد النص وانسخه")}) ?? (ta.select(),toast("حدّد النص وانسخه"));break}
+    case"import":{try{const o=JSON.parse(document.getElementById("bk").value);if(!o.profile||!o.weights)throw 0;o.apiKey=S.apiKey;S=o;save();render();toast("تم الاستيراد")}catch(err){toast("النص غير صالح. الصق النسخة كاملة")}break}
+    case"reset":document.getElementById("confirm").innerHTML=`<div class="advice r"><i></i><div><b>متأكد؟</b> سيُحذف كل سجلك.<div class="row" style="margin-top:8px"><button class="btn-danger btn-sm" data-act="reset-yes">نعم، امسح</button><button class="btn-sm" data-act="reset-no">لا</button></div></div></div>`;break;
+    case"reset-yes":S=JSON.parse(JSON.stringify(DEF));save();render();toast("بداية جديدة");break;
+    case"reset-no":document.getElementById("confirm").innerHTML="";break;
+  }
+});
+render();
+</script>
+</body></html>
